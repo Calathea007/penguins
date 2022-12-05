@@ -1,0 +1,124 @@
+---
+title: "Penguin_assignment"
+author: ''
+date: "2022-11-18"
+output:
+  html_document: default
+  pdf_document: default
+---
+# Question 4: Statistical tests and figures
+
+## Setting the working directory:
+
+```{r, results = FALSE}
+#Set your working directory here and check it is correct. 
+setwd()
+getwd()
+```
+
+## Install and download the penguin data set and appropriate packages:
+
+```{r, message = FALSE}
+source("functions/library.R")
+```
+
+### First, assess the penguins data to see if it requires cleaning
+
+```{r}
+head(penguins_raw)
+```
+
+### So, this data set has column names with spaces and capitals. So, we must clean it to remove these so that we can specify the columns we want in the figure easily.
+
+### But, first we must save the raw, un-edited data
+```{r}
+write.csv(penguins_raw, paste0("data_raw/penguins_raw.csv"))
+```
+
+## Now, cleaning the dataset:
+
+### I have made various cleaning functions and saved them separately in an R script file called cleaning so I must source it in to apply it to the data.
+```{r}
+source("functions/cleaning.R")
+```
+
+### Now to use the sourced cleaning function to make a clean dataset called penguins_clean. Check afterwards that it is clean using the names() and head() functions.
+
+```{r}
+penguins_clean <- cleaning(penguins_raw)
+names(penguins_clean)
+write.csv(penguins_clean, paste0("data_clean/penguins_clean.csv"))
+head(penguins_clean)
+```
+
+### So, we have already loaded and cleaned our dataset. So, now let's do a linear regression of bodymass and flipper length
+
+## Performing a linear regression:
+
+```{r}
+flipper_regression <- lm(formula = flipper_length_mm ~ body_mass_g, data = penguins_clean)
+```
+
+## Analysing the significance of our linear regression model:
+
+```{r}
+summary(flipper_regression)
+anova(flipper_regression)
+```
+
+### The P-value for the F-statistic is much less than 0.05. This shows that our model is statistically significant and that flipper length changes significantly with changes in body mass.
+### The R-squared value shows that 76% of the variation in y (flipper length) is explained by variation in x (body mass).
+### The Pr values in our coefficient table tell us that both the intercept and slope are significantly different from 0. 
+### Our slope is positive and shows that flipper length increases with increasing body mass. 
+
+### So, our model is significant. But, before we plot this regression we must check that this model fits the assumptions of a regression using diagnostic plots. 
+
+## Testing assumptions:
+
+### I will test 2 assumptions (a) and (b)
+
+### (a) - Testing if our data is normally distributed using a Normal Q-Q plot. 
+
+```{r}
+plot(flipper_regression, which = 2)
+```
+
+### This plot shows that our data fits well with the assumption of normally distributed residuals as our points fall in an almost completely straight line. This straight line falls almost exaclty on the dotted line we expect under a normal distribution. At each x value, our possible Y values (residuals) are thus approximately normally distributed. 
+
+### (b) - Testing for equal variance of y values across all x values
+
+```{r}
+plot(flipper_regression, which =1)
+```
+
+### Our data fit the assumption of equal variance well as firstly the red line falls close to the residual 0 line. Also, there is an equal spread of points above and below the line and there is no trend in how close residuals are to 0 as we go from left to right. There are also no key outliers.
+
+## Plotting our regression:
+
+### So, our model is significant and our data fits the assumptions so we can now make the figure.
+
+### I have made a regression plotting function which I have saved separately in a plotting file which I will now source in. 
+
+```{r}
+source("functions/plotting.R")
+```
+
+### This function uses a colour blind friendly palette with differently coloured and shaped points for each species to show that the regression trend is maintained within each species.
+
+```{r, warning = FALSE}
+flipper_mass_regression_plot <- plot_regression_figure(penguins_clean)
+flipper_mass_regression_plot
+```
+
+
+### So we have created our figure. Now we must save it as a svg of the correct size and scaling. 
+
+## Saving our image as an svg:
+
+### I have sourced my svg saving code.
+```{r, message = FALSE, warning = FALSE, results = FALSE}
+source("functions/saving_figures.R")
+save_regression_plot_svg(penguins_clean, 'figures/regression_fig01_vector.svg',
+                         size = 20, scaling = 1.1) 
+```
+
