@@ -51,7 +51,7 @@ write.csv(penguins_clean, paste0("data_clean/penguins_clean.csv"))
 head(penguins_clean)
 ```
 
-### So, we have already loaded and cleaned our dataset. So, now let's do a linear regression of bodymass and flipper length
+### So, we have already loaded and cleaned our dataset. So, now let's do a linear regression of bodymass and flipper length to see if there is a relationship between the two. 
 
 ## Performing a linear regression:
 
